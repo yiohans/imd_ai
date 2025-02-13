@@ -5,13 +5,24 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.12,<3.13"
 pandas = "^2.2.3"
 tensorflow = "^2.18.0"
 matplotlib = "^3.10.0"
 ipykernel = "^6.29.5"
+torch       = { version = "^2.5.1", source = "pytorch-cpu", markers = "extra=='cpu' and extra!='cuda'" }
+torchvision = { version = "^0.20", source = "pytorch-cpu", markers = "extra=='cpu' and extra!='cuda'" }
+torchaudio  = { version = "^2.5.1", source = "pytorch-cpu", markers = "extra=='cpu' and extra!='cuda'" }
+lightning = "^2.4.0"
+ultralytics = "^8.3.75"
+
+[[tool.poetry.source]]
+name     = "pytorch-cpu"
+priority = "explicit"
+url      = "https://download.pytorch.org/whl/cpu"
 
 
 [tool.poetry.group.dev.dependencies]
