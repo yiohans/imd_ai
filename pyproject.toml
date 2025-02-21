@@ -19,6 +19,15 @@ torchaudio  = { version = "^2.5.1", source = "pytorch-cpu", markers = "extra=='c
 lightning = "^2.4.0"
 ultralytics = "^8.3.75"
 requests = "^2.32.3"
+wandb = "^0.19.7"
+weave = "^0.51.34"
+langchain = "^0.3.19"
+langchain-community = "^0.3.18"
+langchain-openai = "^0.3.6"
+dotenv = "^0.9.9"
+ollama = "^0.4.7"
+langchain-ollama = "^0.2.3"
+langchain-core = "^0.3.37"
 
 [[tool.poetry.source]]
 name     = "pytorch-cpu"
