@@ -28,6 +28,7 @@ dotenv = "^0.9.9"
 ollama = "^0.4.7"
 langchain-ollama = "^0.2.3"
 langchain-core = "^0.3.37"
+docling = "^2.24.0"
 
 [[tool.poetry.source]]
 name     = "pytorch-cpu"
