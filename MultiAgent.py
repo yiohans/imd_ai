@@ -5,25 +5,30 @@ from langchain_groq import ChatGroq
 from langgraph_supervisor import create_supervisor
 from langgraph.prebuilt import create_react_agent
 
-from tools import search_process, get_documents_from_process
+from tools import *
 
 class MultiAgents:
     def __init__(self, models):
         self.supervisor_model, self.agent_model = self.initialize_models(models)
-        self.chat_agent = self.initialize_agent(
-            name="chat_agent",
-            tools=[],
-            prompt="You can only chat with the user."
-        )
+        # self.chat_agent = self.initialize_agent(
+        #     name="chat_agent",
+        #     tools=[],
+        #     prompt="You can only chat with the user."
+        # )
         self.research_agent = self.initialize_agent(
-            name="research_agent",
-            tools=[search_process, get_documents_from_process],
-            prompt="You can only search for SEI processes and get documents from them."
+            name="sei_research_agent",
+            tools=[search_process, get_document_list_from_process, get_document_by_type],
+            prompt=(
+                "Você é especialista em obter informações sobre processos do SEI. "
+                "Você é capaz de: "
+                "pesquisar processos usando a função search_process, "
+                "listar documentos de um processo usando a função get_document_list_from_process, "
+                "e obter tipos específicos de documentos de um processo usando a função get_document_by_type. "
+            )
         )
         self.graph = self.initialize_graph((
-            "You are a team supervisor managing a team of experts. "
-            "For conversation, use chat_agent. "
-            "For processes information, use research_agent."
+            "Você é um supervisor de equipe gerenciando um time de especialistas. "
+            "Para informações sobre processos, use sei_research_agent."
         ))
 
     def initialize_models(self, models):
@@ -71,10 +76,10 @@ class MultiAgents:
     
     def initialize_graph(self, prompt):
         workflow = create_supervisor(
-            [self.chat_agent, self.research_agent],
+            [self.research_agent],
             model=self.supervisor_model,
             prompt=prompt,
-            output_mode="last_message"
+            output_mode="full_history"
         )
         return workflow.compile()
     
@@ -87,5 +92,6 @@ class MultiAgents:
     def stream(self, messages, recursion_limit=10):
         return self.graph.stream(
             messages,
-            {"recursion_limit": recursion_limit}
+            {"recursion_limit": recursion_limit},
+            stream_mode="values"
         )

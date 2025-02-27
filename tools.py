@@ -3,22 +3,22 @@ from typing import Optional
 
 def search_process(id: str) -> str:
     """
-    Search for a SEI process folder in the file system.
+    Procura uma pasta de processo SEI no sistema de arquivos.
 
-    Use this function to locate administrative process documents by their reference number.
-    The function handles both traditional (166/2025) and compact (1662025) ID formats.
+    Use esta função para localizar documentos de processos administrativos pelo seu número de referência.
+    A função lida com formatos de ID tradicionais (166/2025) e compactos (1662025).
 
     Args:
-        id (str): Process number in either format:
-            - Separated format: "166/2025"
-            - Compact format: "1662025"
-            The number will be automatically padded if needed.
+        id (str): Número do processo em qualquer formato:
+            - Formato separado: "166/2025"
+            - Formato compacto: "1662025"
+            O número será automaticamente preenchido com zeros à esquerda se necessário.
 
     Returns:
-        str: One of:
-            - Folder name (e.g., "SEI_00166_2025") if process exists
-            - None if process not found (compact format)
-            - "Process not found" if process not found (separated format or errors)
+        str: Um dos seguintes:
+            - Nome da pasta (ex: "SEI_00166_2025") se o processo existir
+            - None se o processo não for encontrado (formato compacto)
+            - "Process not found" se o processo não for encontrado (formato separado ou erros)
     """
     root_path = os.path.abspath("")
     processes_path = os.path.join(root_path, "processos")
@@ -53,31 +53,31 @@ def search_process(id: str) -> str:
         print(f"Error: {e}")
         return "Process not found"
 
-def get_documents_from_process(
+def get_document_list_from_process(
     parameters: str
 ) -> list[str]:
     """
-    Retrieve PDF documents from a SEI process folder with pagination support.
+    Recupera documentos PDF de uma pasta de processo SEI com suporte a paginação.
 
-    Use this function to get a list of PDF documents within a process folder.
-    Results can be paginated using limit and offset parameters.
-    Typically used after locating a process folder with search_process().
+    Use esta função para obter uma lista de documentos PDF dentro de uma pasta de processo.
+    Os resultados podem ser paginados usando parâmetros de limite e deslocamento.
+    Normalmente usado após localizar uma pasta de processo com search_process().
 
     Args:
-        parameters (str): A string containing the process folder name and pagination parameters.
-            The string should be formatted as follows:
+        parameters (str): Uma string contendo o nome da pasta do processo e parâmetros de paginação.
+            A string deve ser formatada da seguinte forma:
             "process_folder,limit,offset"
-            - process_folder: The name of the process folder (e.g., "SEI_00166_2025")
-            - limit: The maximum number of documents to return (default: 10)
-            - offset: The number of documents to skip (default: 0)
+            - process_folder: O nome da pasta do processo (ex: "SEI_00166_2025")
+            - limit: O número máximo de documentos a retornar (padrão: 10)
+            - offset: O número de documentos a pular (padrão: 0)
 
     Returns:
-        Union[dict(str : list[str], str : int), str]: One of:
-            - A dict containing:
-                - "documents": A list of PDF document names
-                - "total_number_of_documents": The total number of documents in the folder
-            - "Invalid parameters" if the input string is not formatted correctly
-            - "Process folder not found" if the process folder does not exist
+        Union[dict(str : list[str], str : int), str]: Um dos seguintes:
+            - Um dicionário contendo:
+                - "documents": Uma lista de nomes de documentos PDF
+                - "total_number_of_documents": O número total de documentos na pasta
+            - "Invalid parameters" se a string de entrada não estiver formatada corretamente
+            - "Process folder not found" se a pasta do processo não existir
     """
     try:
         process_folder, limit, offset = parameters.split(",")
@@ -106,17 +106,13 @@ def get_documents_from_process(
 
 def read_doc(file_path: str) -> Optional[str]:
     """
-    Reads a PDF document and extracts its text content.
+    Lê um documento PDF e extrai seu conteúdo de texto.
 
     Args:
-        file_path (str): The path to the PDF file.
+        file_path (str): O caminho para o arquivo PDF.
 
     Returns:
-        Optional[str]: The extracted text from the PDF, or None if an error occurs.
-
-    Notes:
-        - Uses PyPDF2 to read the PDF.
-        - Returns None if the file cannot be read or an exception occurs.
+        Optional[str]: O texto extraído do PDF, ou None se ocorrer um erro.
     """
     from PyPDF2 import PdfReader
     try:
@@ -128,3 +124,36 @@ def read_doc(file_path: str) -> Optional[str]:
         return "\n".join(contents)
     except Exception as e:
         return f"Error: {e}"
+    
+def get_document_by_type(parameters : str) -> str:
+    """
+    Obter uma lista de documentos de um tipo específico de um processo SEI.
+    
+    Args:
+        parameters (str): Uma string contendo o ID do processo e tipo de documento.
+            A string deve ser formatada da seguinte forma:
+            "process_id,document_type"
+            - process_id: O ID do processo (ex: "166/2025") 
+            - document_type: O tipo de documento a ser procurado (ex: "Despacho")
+    """
+    process_id , document_type = parameters.split(",")
+    process_folder = search_process(process_id)
+    if process_folder == "Process not found" or process_folder == "Process folder not found":
+        return process_folder
+    response = get_document_list_from_process(f"{process_folder},1,0")
+    total_documents = response["total_number_of_documents"]
+    response = get_document_list_from_process(f"{process_folder},{total_documents},0")
+    documents = response["documents"]
+    documents_found = [
+        document
+        for document in documents
+        if document_type.lower() in document.lower()
+    ]
+    if len(documents_found) > 0:
+        return {
+            "documents" : documents_found
+        }
+    else:
+        return f"Documents of type {document_type} not found in process {process_id}"
+            
+    
