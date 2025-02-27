@@ -6,18 +6,18 @@ def search_process(id: str) -> str:
     Procura uma pasta de processo SEI no sistema de arquivos.
 
     Use esta função para localizar documentos de processos administrativos pelo seu número de referência.
-    A função lida com formatos de ID tradicionais (166/2025) e compactos (1662025).
+    A função lida com formatos de ID tradicionais (XXX/YYYY) e compactos (XXXYYYY).
 
     Args:
         id (str): Número do processo em qualquer formato:
-            - Formato separado: "166/2025"
-            - Formato compacto: "1662025"
+            - Formato separado: "XXX/YYYY"
+            - Formato compacto: "XXXYYYY"
             O número será automaticamente preenchido com zeros à esquerda se necessário.
 
     Returns:
         str: Um dos seguintes:
-            - Nome da pasta (ex: "SEI_00166_2025") se o processo existir
-            - None se o processo não for encontrado (formato compacto)
+            - Nome da pasta se o processo existir
+            - None se o processo não for encontrado
             - "Process not found" se o processo não for encontrado (formato separado ou erros)
     """
     root_path = os.path.abspath("")
@@ -67,9 +67,9 @@ def get_document_list_from_process(
         parameters (str): Uma string contendo o nome da pasta do processo e parâmetros de paginação.
             A string deve ser formatada da seguinte forma:
             "process_folder,limit,offset"
-            - process_folder: O nome da pasta do processo (ex: "SEI_00166_2025")
-            - limit: O número máximo de documentos a retornar (padrão: 10)
-            - offset: O número de documentos a pular (padrão: 0)
+            - process_folder: O nome da pasta do processo
+            - limit: O número máximo de documentos a retornar
+            - offset: O número de documentos a pular
 
     Returns:
         Union[dict(str : list[str], str : int), str]: Um dos seguintes:
@@ -133,8 +133,8 @@ def get_document_by_type(parameters : str) -> str:
         parameters (str): Uma string contendo o ID do processo e tipo de documento.
             A string deve ser formatada da seguinte forma:
             "process_id,document_type"
-            - process_id: O ID do processo (ex: "166/2025") 
-            - document_type: O tipo de documento a ser procurado (ex: "Despacho")
+            - process_id: O ID do processo (ex: "XXX/YYYY" ou "XXXYYYY") 
+            - document_type: O tipo de documento a ser procurado
     """
     process_id , document_type = parameters.split(",")
     process_folder = search_process(process_id)
