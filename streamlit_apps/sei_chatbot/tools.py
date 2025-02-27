@@ -127,7 +127,7 @@ def read_doc(file_path: str) -> Optional[str]:
     
 def get_document_by_type(parameters : str) -> str:
     """
-    Obter uma lista de documentos de um tipo específico de um processo SEI.
+    Obtem uma lista de documentos por tipo de um processo SEI.
     
     Args:
         parameters (str): Uma string contendo o ID do processo e tipo de documento.

@@ -6,11 +6,17 @@ from typing import Optional, Tuple
 
 from MultiAgent import MultiAgents
 
-import logging
+import logging, os
 logging.basicConfig(level=logging.INFO)
 
 # Load environment variables
-load_dotenv()
+load_dotenv(
+    override=True
+)
+
+logging.info("Loaded environment variables")
+logging.info(f"GROQ_API_KEY: {os.getenv('GROQ_API_KEY')}")
+logging.info(f"WANDB_API_KEY: {os.getenv('WANDB_API_KEY')}")
 
 # Initialize Weave
 weave.init("streamlit_sei")
@@ -19,10 +25,10 @@ def initialize_session_state():
     """Initialize the session state with a welcome message."""
     if "messages" not in st.session_state:
         st.session_state['messages'] = [
-            {
-                "role": "assistant",
-                "content": "Olá! Como posso ajudar você com o Sistema Eletrônico de Informações (SEI)?"
-            }
+            # {
+            #     "role": "assistant",
+            #     "content": "Olá! Como posso ajudar você com o Sistema Eletrônico de Informações (SEI)?"
+            # }
         ]
 
 def get_message(message_data) -> Optional[Tuple[str, str]]:
