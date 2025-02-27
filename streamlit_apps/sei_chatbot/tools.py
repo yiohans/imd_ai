@@ -151,7 +151,8 @@ def get_document_by_type(parameters : str) -> str:
     ]
     if len(documents_found) > 0:
         return {
-            "documents" : documents_found
+            "documents" : documents_found,
+            "number_of_documents" : len(documents_found)
         }
     else:
         return f"Documents of type {document_type} not found in process {process_id}"
