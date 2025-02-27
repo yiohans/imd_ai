@@ -2,6 +2,7 @@ import subprocess
 
 from langchain_ollama import ChatOllama
 from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph_supervisor import create_supervisor
 from langgraph.prebuilt import create_react_agent
 
@@ -49,6 +50,12 @@ class MultiAgents:
                     )
                 model_name = models['supervisor']['model']
                 subprocess.run(["ollama", "pull", model_name])
+            case "google":
+                print("Using Google Generative AI model for supervisor")
+                llm_supervisor = ChatGoogleGenerativeAI(
+                    model=models['supervisor']['model'],
+                    temperature=models['supervisor']['temperature']
+                )
                 
         match models['agent']['provider']:
             case "groq":
@@ -65,6 +72,13 @@ class MultiAgents:
                     )
                 model_name = models['agent']['model']
                 subprocess.run(["ollama", "pull", model_name])
+            case "google":
+                print("Using Google Generative AI model for agent")
+                llm_agent = ChatGoogleGenerativeAI(
+                    model=models['agent']['model'],
+                    temperature=models['agent']['temperature']
+                )
+                
         return llm_supervisor, llm_agent
     
     def initialize_agent(self, name, prompt, tools):
