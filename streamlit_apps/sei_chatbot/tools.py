@@ -1,5 +1,6 @@
 import os
 from typing import Optional
+import json
 
 def search_process(id: str) -> str:
     """
@@ -20,8 +21,9 @@ def search_process(id: str) -> str:
             - None se o processo não for encontrado
             - "Process not found" se o processo não for encontrado (formato separado ou erros)
     """
-    root_path = os.path.abspath("")
+    root_path = os.path.dirname(__file__)
     processes_path = os.path.join(root_path, "processos")
+    # print(f"Processes path: {processes_path}")
     try:
         if len(id) < 9:
             if id.find("/") == -1:
@@ -66,8 +68,8 @@ def get_document_list_from_process(
     Args:
         parameters (str): Uma string contendo o nome da pasta do processo e parâmetros de paginação.
             A string deve ser formatada da seguinte forma:
-            "process_folder,limit,offset"
-            - process_folder: O nome da pasta do processo
+            "process_id,limit,offset"
+            - process_id: O número do processo
             - limit: O número máximo de documentos a retornar
             - offset: O número de documentos a pular
 
@@ -80,14 +82,18 @@ def get_document_list_from_process(
             - "Process folder not found" se a pasta do processo não existir
     """
     try:
-        process_folder, limit, offset = parameters.split(",")
+        process_id, limit, offset = parameters.split(",")
+        process_folder = search_process(process_id)
+        if process_folder == "Process not found" or process_folder == "Process folder not found":
+            return process_folder
         limit = int(limit)
         offset = int(offset)
     except Exception as e:
         print(f"Error: {e}")
         return "Invalid parameters"
     try:
-        tree = os.walk(os.path.join(os.path.abspath(""), "processos", process_folder))
+        root_path = os.path.dirname(__file__)
+        tree = os.walk(os.path.join(root_path, "processos", process_folder))
         documents = []
         for root, dirs, files in tree:
             documents.extend([
@@ -140,9 +146,13 @@ def get_document_by_type(parameters : str) -> str:
     process_folder = search_process(process_id)
     if process_folder == "Process not found" or process_folder == "Process folder not found":
         return process_folder
-    response = get_document_list_from_process(f"{process_folder},1,0")
-    total_documents = response["total_number_of_documents"]
-    response = get_document_list_from_process(f"{process_folder},{total_documents},0")
+    response = get_document_list_from_process(f"{process_id},1,0")
+    try:
+        total_documents = response["total_number_of_documents"]
+    except Exception as e:
+        print(f"Error: {e}")
+        return "Error: Could not retrieve total number"
+    response = get_document_list_from_process(f"{process_id},{total_documents},0")
     documents = response["documents"]
     documents_found = [
         document
