@@ -78,7 +78,14 @@ def should_display_message(content: str) -> bool:
 def main():
     # Page configuration
     st.title("💬 Chatbot SEI TRE-RN")
-    st.caption("Um chatbot para responder perguntas sobre processos no Sistema Eletrônico de Informações (SEI) do Tribunal Regional Eleitoral do Rio Grande do Norte (TRE-RN).")
+    st.caption((
+        "Um chatbot para responder perguntas sobre processos no Sistema Eletrônico "
+        "de Informações (SEI) do Tribunal Regional Eleitoral do Rio Grande do Norte (TRE-RN). "
+        "Hoje é possível responder perguntas como: "
+        " \"O processo XXX/XXXX existe? \", "
+        " \"Quais são os documentos do processo XXX/XXXX?\" "
+        " e \"Quais documentos do tipo xxxxxx do processo XXX/XXXX?\""
+        ))
     
     # Initialize session state
     initialize_session_state()
@@ -99,7 +106,10 @@ def main():
         try:
             # Stream the response
             with st.spinner("Processando sua pergunta..."):
-                stream = agents.stream({"messages": st.session_state['messages']})
+                stream = agents.stream(
+                    {"messages": st.session_state['messages']},
+                    recursion_limit=25
+                    )
                 
                 # Create a placeholder for the assistant's message
                 message_placeholder = st.chat_message("assistant")
