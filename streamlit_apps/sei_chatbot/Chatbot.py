@@ -57,8 +57,8 @@ def setup_agents():
             "temperature": 0.0
         },
         "agent": {
-            "provider": "groq",
-            "model": "llama3-8b-8192",
+            "provider": "google",
+            "model": "gemini-2.0-flash-lite",
             "temperature": 0.0
         },
     }
