@@ -30,6 +30,7 @@ class MultiAgents:
             "Você é um chatbot com um time de especialistas para atender o usuário. "
             "Use sei_research_agent para responder perguntas sobre processos no "
             "Sistema Eletrônico de Informações (SEI) do TRE do Rio Grande do Norte (TRE-RN)."
+            "Lembre que o usuário não consegue visualizar as mensagens dos especialistas."
         ))
 
     def initialize_models(self, models):
@@ -80,7 +81,7 @@ class MultiAgents:
             [self.research_agent],
             model=self.supervisor_model,
             prompt=prompt,
-            output_mode="full_history"
+            output_mode="last_message"
         )
         return workflow.compile()
     
