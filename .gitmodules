@@ -1,0 +1,4 @@
+[submodule "sei_chatbot"]
+	path = streamlit_apps/sei_chatbot
+	url = https://github.com/yiohans/sei_chatbot.git
+	branch = main
